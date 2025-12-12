@@ -188,14 +188,14 @@ export default function ProdutosPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Produtos</h1>
-          <p className="text-red-300">Gerencie o catálogo e estoque de produtos</p>
+          <h1 className="text-xl sm:text-3xl font-bold text-white">Produtos</h1>
+          <p className="text-red-300 text-sm sm:text-base">Gerencie o catálogo e estoque de produtos</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-colors text-sm sm:text-base"
         >
           <Plus className="w-4 h-4" />
           <span>Novo Produto</span>
@@ -210,11 +210,10 @@ export default function ProdutosPage() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setCategoriaFiltro('todas')}
-                className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                  categoriaFiltro === 'todas'
+                className={`px-3 py-1 rounded-full text-sm transition-colors ${categoriaFiltro === 'todas'
                     ? 'bg-red-600 text-white'
                     : 'bg-red-900/50 text-red-300 hover:bg-red-800/50'
-                }`}
+                  }`}
               >
                 Todas ({produtos.length})
               </button>
@@ -222,11 +221,10 @@ export default function ProdutosPage() {
                 <button
                   key={categoria}
                   onClick={() => setCategoriaFiltro(categoria)}
-                  className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                    categoriaFiltro === categoria
+                  className={`px-3 py-1 rounded-full text-sm transition-colors ${categoriaFiltro === categoria
                       ? 'bg-red-600 text-white'
                       : 'bg-red-900/50 text-red-300 hover:bg-red-800/50'
-                  }`}
+                    }`}
                 >
                   {getCategoriaIcon(categoria)} {categoria} ({produtos.filter(p => p.categoria === categoria).length})
                 </button>

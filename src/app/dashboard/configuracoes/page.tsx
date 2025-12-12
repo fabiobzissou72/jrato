@@ -85,9 +85,10 @@ export default function ConfiguracoesPage() {
       const { data, error } = await supabase
         .from('configuracoes')
         .select('*')
-        .single()
+        .limit(1)
+        .maybeSingle()
 
-      if (data && !error) {
+      if (data) {
         // Se não existir horarios_por_dia, criar baseado nos dados antigos
         if (!data.horarios_por_dia) {
           const horariosPorDia: Record<string, HorarioDia> = {}
@@ -126,13 +127,24 @@ export default function ConfiguracoesPage() {
       console.log('💾 Salvando configurações...', config)
 
       let result
-      // Tentar salvar (se tabela existir)
-      if (config.id) {
-        console.log('📝 Atualizando registro existente, ID:', config.id)
+
+      // Verificar se já existe alguma configuração salva para garantir singleton
+      const { data: existingConfig } = await supabase
+        .from('configuracoes')
+        .select('id')
+        .limit(1)
+        .maybeSingle()
+
+      const idToUpdate = config.id || existingConfig?.id
+
+      if (idToUpdate) {
+        console.log('📝 Atualizando registro existente, ID:', idToUpdate)
         result = await supabase
           .from('configuracoes')
           .update(config)
-          .eq('id', config.id)
+          .eq('id', idToUpdate)
+          .select()
+          .single()
       } else {
         console.log('➕ Criando novo registro')
         result = await supabase
@@ -149,9 +161,9 @@ export default function ConfiguracoesPage() {
         throw result.error
       }
 
-      // Se for inserção, atualizar com o novo ID retornado
-      if (!config.id && result.data) {
-        setConfig({ ...config, id: result.data.id })
+      // Atualizar estado com os dados retornados
+      if (result.data) {
+        setConfig(result.data)
       }
 
       alert('✅ Configurações salvas com sucesso!')
@@ -208,15 +220,15 @@ export default function ConfiguracoesPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Configurações</h1>
-          <p className="text-red-300">Gerencie as configurações da barbearia</p>
+          <h1 className="text-xl sm:text-3xl font-bold text-white">Configurações</h1>
+          <p className="text-red-300 text-sm sm:text-base">Gerencie as configurações da barbearia</p>
         </div>
         <button
           onClick={handleSave}
           disabled={salvando}
-          className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50"
+          className="flex items-center space-x-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm sm:text-base"
         >
           <Save className="w-4 h-4" />
           <span>{salvando ? 'Salvando...' : 'Salvar Alterações'}</span>
@@ -287,21 +299,19 @@ export default function ConfiguracoesPage() {
               const isAtivo = horario?.ativo ?? false
 
               return (
-                <div key={dia} className={`p-4 rounded-lg border transition-all ${
-                  isAtivo
+                <div key={dia} className={`p-4 rounded-lg border transition-all ${isAtivo
                     ? 'bg-red-700/20 border-red-600/50'
                     : 'bg-zinc-800/50 border-zinc-700/50'
-                }`}>
-                  <div className="flex items-center justify-between gap-4">
+                  }`}>
+                  <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                     {/* Checkbox e Nome do Dia */}
                     <div className="flex items-center space-x-3 min-w-[120px]">
                       <button
                         onClick={() => toggleDia(dia)}
-                        className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
-                          isAtivo
+                        className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${isAtivo
                             ? 'bg-red-600 border-red-600'
                             : 'bg-zinc-700 border-zinc-600'
-                        }`}
+                          }`}
                       >
                         {isAtivo && (
                           <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -315,9 +325,9 @@ export default function ConfiguracoesPage() {
                     </div>
 
                     {/* Horários */}
-                    <div className="flex items-center space-x-3 flex-1">
-                      <div className="flex items-center space-x-2 flex-1">
-                        <label className={`text-sm whitespace-nowrap ${isAtivo ? 'text-red-300' : 'text-zinc-500'}`}>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto flex-1">
+                      <div className="flex items-center space-x-2 w-full sm:w-auto">
+                        <label className={`text-sm whitespace-nowrap w-20 sm:w-auto ${isAtivo ? 'text-red-300' : 'text-zinc-500'}`}>
                           Abertura:
                         </label>
                         <input
@@ -325,18 +335,17 @@ export default function ConfiguracoesPage() {
                           value={horario?.abertura || '09:00'}
                           onChange={(e) => updateHorarioDia(dia, 'abertura', e.target.value)}
                           disabled={!isAtivo}
-                          className={`px-3 py-2 rounded text-sm ${
-                            isAtivo
+                          className={`flex-1 sm:flex-none px-3 py-2 rounded text-sm ${isAtivo
                               ? 'bg-zinc-800 border border-red-600/50 text-white'
                               : 'bg-zinc-700/50 border border-zinc-600/50 text-zinc-500'
-                          }`}
+                            }`}
                         />
                       </div>
 
-                      <span className={`${isAtivo ? 'text-red-300' : 'text-zinc-500'}`}>às</span>
+                      <span className={`hidden sm:inline ${isAtivo ? 'text-red-300' : 'text-zinc-500'}`}>às</span>
 
-                      <div className="flex items-center space-x-2 flex-1">
-                        <label className={`text-sm whitespace-nowrap ${isAtivo ? 'text-red-300' : 'text-zinc-500'}`}>
+                      <div className="flex items-center space-x-2 w-full sm:w-auto">
+                        <label className={`text-sm whitespace-nowrap w-20 sm:w-auto ${isAtivo ? 'text-red-300' : 'text-zinc-500'}`}>
                           Fechamento:
                         </label>
                         <input
@@ -344,22 +353,20 @@ export default function ConfiguracoesPage() {
                           value={horario?.fechamento || '19:00'}
                           onChange={(e) => updateHorarioDia(dia, 'fechamento', e.target.value)}
                           disabled={!isAtivo}
-                          className={`px-3 py-2 rounded text-sm ${
-                            isAtivo
+                          className={`flex-1 sm:flex-none px-3 py-2 rounded text-sm ${isAtivo
                               ? 'bg-zinc-800 border border-red-600/50 text-white'
                               : 'bg-zinc-700/50 border border-zinc-600/50 text-zinc-500'
-                          }`}
+                            }`}
                         />
                       </div>
                     </div>
 
                     {/* Status */}
-                    <div className="min-w-[80px] text-right">
-                      <span className={`text-xs px-2 py-1 rounded ${
-                        isAtivo
+                    <div className="hidden md:block min-w-[80px] text-right">
+                      <span className={`text-xs px-2 py-1 rounded ${isAtivo
                           ? 'bg-green-500/20 text-green-400'
                           : 'bg-red-500/20 text-red-400'
-                      }`}>
+                        }`}>
                         {isAtivo ? 'Aberto' : 'Fechado'}
                       </span>
                     </div>
@@ -412,13 +419,11 @@ export default function ConfiguracoesPage() {
               <span className="text-red-300">Aceitar Agendamento Online</span>
               <button
                 onClick={() => setConfig({ ...config, aceita_agendamento_online: !config.aceita_agendamento_online })}
-                className={`w-12 h-6 rounded-full transition-colors ${
-                  config.aceita_agendamento_online ? 'bg-red-600' : 'bg-zinc-600'
-                }`}
+                className={`w-12 h-6 rounded-full transition-colors ${config.aceita_agendamento_online ? 'bg-red-600' : 'bg-zinc-600'
+                  }`}
               >
-                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                  config.aceita_agendamento_online ? 'translate-x-6' : 'translate-x-1'
-                }`} />
+                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${config.aceita_agendamento_online ? 'translate-x-6' : 'translate-x-1'
+                  }`} />
               </button>
             </div>
           </CardContent>
@@ -500,13 +505,11 @@ export default function ConfiguracoesPage() {
               </div>
               <button
                 onClick={() => setConfig({ ...config, notif_confirmacao: !config.notif_confirmacao })}
-                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                  config.notif_confirmacao ? 'bg-green-600' : 'bg-zinc-600'
-                }`}
+                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${config.notif_confirmacao ? 'bg-green-600' : 'bg-zinc-600'
+                  }`}
               >
-                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                  config.notif_confirmacao ? 'translate-x-6' : 'translate-x-1'
-                }`} />
+                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${config.notif_confirmacao ? 'translate-x-6' : 'translate-x-1'
+                  }`} />
               </button>
             </div>
 
@@ -521,13 +524,11 @@ export default function ConfiguracoesPage() {
               </div>
               <button
                 onClick={() => setConfig({ ...config, notif_lembrete_24h: !config.notif_lembrete_24h })}
-                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                  config.notif_lembrete_24h ? 'bg-green-600' : 'bg-zinc-600'
-                }`}
+                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${config.notif_lembrete_24h ? 'bg-green-600' : 'bg-zinc-600'
+                  }`}
               >
-                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                  config.notif_lembrete_24h ? 'translate-x-6' : 'translate-x-1'
-                }`} />
+                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${config.notif_lembrete_24h ? 'translate-x-6' : 'translate-x-1'
+                  }`} />
               </button>
             </div>
 
@@ -542,13 +543,11 @@ export default function ConfiguracoesPage() {
               </div>
               <button
                 onClick={() => setConfig({ ...config, notif_lembrete_2h: !config.notif_lembrete_2h })}
-                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                  config.notif_lembrete_2h ? 'bg-green-600' : 'bg-zinc-600'
-                }`}
+                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${config.notif_lembrete_2h ? 'bg-green-600' : 'bg-zinc-600'
+                  }`}
               >
-                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                  config.notif_lembrete_2h ? 'translate-x-6' : 'translate-x-1'
-                }`} />
+                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${config.notif_lembrete_2h ? 'translate-x-6' : 'translate-x-1'
+                  }`} />
               </button>
             </div>
 
@@ -563,13 +562,11 @@ export default function ConfiguracoesPage() {
               </div>
               <button
                 onClick={() => setConfig({ ...config, notif_followup_3d: !config.notif_followup_3d })}
-                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                  config.notif_followup_3d ? 'bg-green-600' : 'bg-zinc-600'
-                }`}
+                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${config.notif_followup_3d ? 'bg-green-600' : 'bg-zinc-600'
+                  }`}
               >
-                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                  config.notif_followup_3d ? 'translate-x-6' : 'translate-x-1'
-                }`} />
+                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${config.notif_followup_3d ? 'translate-x-6' : 'translate-x-1'
+                  }`} />
               </button>
             </div>
 
@@ -584,13 +581,11 @@ export default function ConfiguracoesPage() {
               </div>
               <button
                 onClick={() => setConfig({ ...config, notif_followup_21d: !config.notif_followup_21d })}
-                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                  config.notif_followup_21d ? 'bg-green-600' : 'bg-zinc-600'
-                }`}
+                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${config.notif_followup_21d ? 'bg-green-600' : 'bg-zinc-600'
+                  }`}
               >
-                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                  config.notif_followup_21d ? 'translate-x-6' : 'translate-x-1'
-                }`} />
+                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${config.notif_followup_21d ? 'translate-x-6' : 'translate-x-1'
+                  }`} />
               </button>
             </div>
 
@@ -605,13 +600,11 @@ export default function ConfiguracoesPage() {
               </div>
               <button
                 onClick={() => setConfig({ ...config, notif_cancelamento: !config.notif_cancelamento })}
-                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${
-                  config.notif_cancelamento ? 'bg-green-600' : 'bg-zinc-600'
-                }`}
+                className={`w-12 h-6 rounded-full transition-colors flex-shrink-0 ${config.notif_cancelamento ? 'bg-green-600' : 'bg-zinc-600'
+                  }`}
               >
-                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                  config.notif_cancelamento ? 'translate-x-6' : 'translate-x-1'
-                }`} />
+                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${config.notif_cancelamento ? 'translate-x-6' : 'translate-x-1'
+                  }`} />
               </button>
             </div>
           </div>

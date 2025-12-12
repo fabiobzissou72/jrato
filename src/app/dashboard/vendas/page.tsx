@@ -203,14 +203,14 @@ export default function VendasPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Vendas</h1>
-          <p className="text-red-300">Registre e acompanhe vendas de produtos</p>
+          <h1 className="text-xl sm:text-3xl font-bold text-white">Vendas</h1>
+          <p className="text-red-300 text-sm sm:text-base">Registre e acompanhe vendas de produtos</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-colors text-sm sm:text-base"
         >
           <Plus className="w-4 h-4" />
           <span>Nova Venda</span>

@@ -284,7 +284,7 @@ export default function RelatoriosPage() {
     }
   }).filter(c => c.isVIP)  // Clientes com is_vip = true OU 5+ visitas
     .sort((a, b) => b.atendimentos - a.atendimentos)
-    // Removido .slice(0, 10) para mostrar TODOS os VIPs
+  // Removido .slice(0, 10) para mostrar TODOS os VIPs
 
   console.log('Clientes VIP (manual OU 5+ visitas):', clientesVIP.length)
 
@@ -335,73 +335,68 @@ export default function RelatoriosPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header com Filtros e Ações */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Relatórios</h1>
-          <p className="text-red-300">Análise completa do desempenho da barbearia</p>
+          <h1 className="text-xl sm:text-3xl font-bold text-white">Relatórios</h1>
+          <p className="text-red-300 text-sm sm:text-base">Análise completa do desempenho da barbearia</p>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           {/* Filtros de Período */}
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-1 sm:gap-2">
             <button
               onClick={() => setPeriodo('todos')}
-              className={`px-3 py-2 rounded text-sm transition-colors ${
-                periodo === 'todos' ? 'bg-red-600 text-white' : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
-              }`}
+              className={`px-2 py-1 sm:px-3 sm:py-2 rounded text-xs sm:text-sm transition-colors ${periodo === 'todos' ? 'bg-red-600 text-white' : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                }`}
             >
               Todos
             </button>
             <button
               onClick={() => setPeriodo('hoje')}
-              className={`px-3 py-2 rounded text-sm transition-colors ${
-                periodo === 'hoje' ? 'bg-red-600 text-white' : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
-              }`}
+              className={`px-2 py-1 sm:px-3 sm:py-2 rounded text-xs sm:text-sm transition-colors ${periodo === 'hoje' ? 'bg-red-600 text-white' : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                }`}
             >
               Hoje
             </button>
             <button
               onClick={() => setPeriodo('semana')}
-              className={`px-3 py-2 rounded text-sm transition-colors ${
-                periodo === 'semana' ? 'bg-red-600 text-white' : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
-              }`}
+              className={`px-2 py-1 sm:px-3 sm:py-2 rounded text-xs sm:text-sm transition-colors ${periodo === 'semana' ? 'bg-red-600 text-white' : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                }`}
             >
               Semana
             </button>
             <button
               onClick={() => setPeriodo('mes')}
-              className={`px-3 py-2 rounded text-sm transition-colors ${
-                periodo === 'mes' ? 'bg-red-600 text-white' : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
-              }`}
+              className={`px-2 py-1 sm:px-3 sm:py-2 rounded text-xs sm:text-sm transition-colors ${periodo === 'mes' ? 'bg-red-600 text-white' : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                }`}
             >
               Mês
             </button>
             <button
               onClick={() => setPeriodo('ano')}
-              className={`px-3 py-2 rounded text-sm transition-colors ${
-                periodo === 'ano' ? 'bg-red-600 text-white' : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
-              }`}
+              className={`px-2 py-1 sm:px-3 sm:py-2 rounded text-xs sm:text-sm transition-colors ${periodo === 'ano' ? 'bg-red-600 text-white' : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                }`}
             >
               Ano
             </button>
           </div>
 
           {/* Botões de Ação */}
-          <div className="flex space-x-2">
+          <div className="flex gap-2">
             <button
               onClick={exportarCSV}
-              className="flex items-center space-x-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors"
+              className="flex items-center space-x-1 px-2 py-1 sm:px-3 sm:py-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs sm:text-sm transition-colors"
               title="Exportar CSV"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3 h-3 sm:w-4 sm:h-4" />
               <span>CSV</span>
             </button>
             <button
               onClick={imprimir}
-              className="flex items-center space-x-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-colors"
+              className="flex items-center space-x-1 px-2 py-1 sm:px-3 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs sm:text-sm transition-colors"
               title="Imprimir"
             >
-              <Printer className="w-4 h-4" />
+              <Printer className="w-3 h-3 sm:w-4 sm:h-4" />
               <span>Imprimir</span>
             </button>
           </div>
@@ -475,10 +470,10 @@ export default function RelatoriosPage() {
 
       {/* Ranking de Barbeiros - O Rei da Tesoura 👑 */}
       <Card className="bg-gradient-to-r from-yellow-800/30 to-orange-800/30 border-yellow-600/50">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center space-x-2">
-            <Trophy className="w-6 h-6 text-yellow-400" />
-            <span>👑 Ranking dos Barbeiros - Os Reis da Tesoura</span>
+        <CardHeader className="pb-2 sm:pb-4">
+          <CardTitle className="text-white flex items-center space-x-2 text-sm sm:text-base">
+            <Trophy className="w-4 h-4 sm:w-6 sm:h-6 text-yellow-400" />
+            <span>👑 Ranking dos Barbeiros</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -486,12 +481,11 @@ export default function RelatoriosPage() {
             {rankingBarbeiros.map((barbeiro, index) => (
               <div key={barbeiro.nome} className="flex items-center justify-between p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
                 <div className="flex items-center space-x-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
-                    index === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' :
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${index === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' :
                     index === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-500' :
-                    index === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600' :
-                    'bg-zinc-700'
-                  }`}>
+                      index === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600' :
+                        'bg-zinc-700'
+                    }`}>
                     {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                   </div>
                   <div>
@@ -517,11 +511,10 @@ export default function RelatoriosPage() {
           className="bg-red-800/30 border-red-700/50 cursor-pointer hover:border-red-500 transition-colors"
           onClick={() => router.push('/dashboard/servicos')}
         >
-          <CardHeader>
-            <CardTitle className="text-white flex items-center space-x-2">
-              <Scissors className="w-5 h-5 text-red-400" />
-              <span>Serviços Mais Populares</span>
-              <span className="text-xs text-red-400">(clique para ver serviços)</span>
+          <CardHeader className="pb-2 sm:pb-4">
+            <CardTitle className="text-white flex items-center space-x-2 text-sm sm:text-base">
+              <Scissors className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
+              <span>Serviços Populares</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -549,11 +542,10 @@ export default function RelatoriosPage() {
           className="bg-red-800/30 border-red-700/50 cursor-pointer hover:border-red-500 transition-colors"
           onClick={() => router.push('/dashboard/produtos')}
         >
-          <CardHeader>
-            <CardTitle className="text-white flex items-center space-x-2">
-              <Package className="w-5 h-5 text-red-400" />
-              <span>Produtos Mais Vendidos</span>
-              <span className="text-xs text-red-400">(clique para ver produtos)</span>
+          <CardHeader className="pb-2 sm:pb-4">
+            <CardTitle className="text-white flex items-center space-x-2 text-sm sm:text-base">
+              <Package className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
+              <span>Produtos Vendidos</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -588,13 +580,12 @@ export default function RelatoriosPage() {
         className="bg-gradient-to-r from-pink-800/30 to-red-800/30 border-pink-700/50 cursor-pointer hover:border-pink-500 transition-colors"
         onClick={() => router.push('/dashboard/clientes?filter=vip')}
       >
-        <CardHeader>
-          <CardTitle className="text-white flex items-center space-x-2">
-            <Star className="w-6 h-6 text-pink-400" />
-            <span>⭐ Clientes VIP - Os Fiéis da Casa</span>
-            <span className="text-xs text-pink-400">(clique para ver apenas VIPs)</span>
+        <CardHeader className="pb-2 sm:pb-4">
+          <CardTitle className="text-white flex items-center space-x-2 text-sm sm:text-base">
+            <Star className="w-4 h-4 sm:w-6 sm:h-6 text-pink-400" />
+            <span>⭐ Clientes VIP</span>
           </CardTitle>
-          <p className="text-sm text-pink-300 mt-2">Marcados manualmente ou com 5+ visitas confirmadas</p>
+          <p className="text-xs sm:text-sm text-pink-300 mt-1">5+ visitas confirmadas</p>
         </CardHeader>
         <CardContent>
           {clientesVIP.length > 0 ? (
@@ -697,11 +688,10 @@ export default function RelatoriosPage() {
                         {mov.hora_movimento ? mov.hora_movimento.substring(0, 5) : '-'}
                       </td>
                       <td className="p-3">
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          mov.tipo === 'servico'
-                            ? 'bg-red-500/20 text-red-400'
-                            : 'bg-red-500/20 text-red-400'
-                        }`}>
+                        <span className={`px-2 py-1 rounded text-xs ${mov.tipo === 'servico'
+                          ? 'bg-red-500/20 text-red-400'
+                          : 'bg-red-500/20 text-red-400'
+                          }`}>
                           {mov.tipo === 'servico' ? '✂️ Serviço' : '📦 Produto'}
                         </span>
                       </td>
@@ -738,15 +728,10 @@ export default function RelatoriosPage() {
 
       {/* Movimentos do Dia - Tabela Detalhada (Fallback se não tiver movimentos_financeiros) */}
       <Card className="bg-red-800/30 border-red-700/50">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center space-x-2">
-            <FileText className="w-5 h-5 text-red-400" />
-            <span>Movimentos do Período - Serviços Detalhados</span>
-            {data.movimentosFinanceiros.length === 0 && (
-              <span className="text-xs text-yellow-400 ml-2">
-                (Configure a tabela de movimentos para dados permanentes)
-              </span>
-            )}
+        <CardHeader className="pb-2 sm:pb-4">
+          <CardTitle className="text-white flex items-center space-x-2 text-sm sm:text-base">
+            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
+            <span>Movimentos do Período</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
